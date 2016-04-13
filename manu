@@ -1,0 +1,60 @@
+#!/bin/perl
+use warnings;
+use Cwd 'abs_path';
+
+sub handleDir
+{
+    local ( $path ) = @_;
+    opendir ( DIRHANDLE, $path ) || die "Directory cannot be opened";
+    $countFile = 10;
+    $countDir = -1;
+
+    foreach $file ( sort readdir ( DIRHANDLE ) )
+    {
+        if ( ( $file =~ /.jpg/ ) || ( $file =~ /.png/ ) || ( $file =~ /.jpeg/ ) )
+        {
+            #   I know it's ugly but I look foward to improve this
+            while ( $countFile >= 10 )
+            {
+                $countFile = 0;
+                $countDir++;
+
+                #   verify if the folder already exists;
+                if ( -e "folder$countDir" )
+                {
+                    print "\"folder$countDir\" already exists\n";
+                    opendir ( FOLDER, "folder$countDir" ) || die "Directory couldn't be checked";
+                    $countFile++ while ( readdir ( FOLDER ) );
+                    closedir ( FOLDER );
+                }
+
+                else
+                {
+                    mkdir "folder$countDir", 0777 || die "\"folder$countDir\" couldn't be readed";
+                }
+            }
+
+            system "mv", $file, "folder$countDir";
+            $countFile++;
+            print "Copying \"$file\" to \"folder$countDir\"\n";
+        }
+    }
+
+    closedir ( DIRHANDLE );
+}
+
+sub main
+{
+    if ( ( 0 != @ARGV ) && ( $ARGV[ 0 ] eq "clean" ) )
+    {
+        system "rm -r folder*";
+    }
+
+    else
+    {
+        $path = abs_path();
+        handleDir ( $path );
+    }
+}
+
+main( );

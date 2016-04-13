@@ -1,0 +1,23 @@
+#!/bin/perl
+
+use warnings;
+
+sub main
+{
+    if ( 0 == @ARGV )
+    {
+        print "Type to reset desktop enviroment: \$ farm cinnamon -- \$ farm -c\n";
+        print "Type to run settings: \$ farm settings -- \$ farm -s\n";
+        print "Type to run update: \$ farm update -- \$ farm -u\n";
+    }
+
+    else
+    {
+        system "gsettings reset-recursively org.cinnamon" if ( ( $ARGV[ 0 ] eq "cinnamon" ) or ( $ARGV[ 0 ] eq "-c" ) );
+        system "cinnamon-settings" if ( ( $ARGV[ 0 ] eq "settings" ) or ( $ARGV[ 0 ] eq "-s" ) );
+        system "sudo pacman -Syyu" if ( ( $ARGV[ 0 ] eq "update" ) or ( $ARGV[ 0 ] eq "-u" ) );
+        system "yaourt -Syu --devel --aur" if ( $ARGV[ 0 ] eq "yaourt" );
+    }
+}
+
+main ( );
